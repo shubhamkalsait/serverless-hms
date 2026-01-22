@@ -118,10 +118,10 @@ const Payments = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <h2 className="page-title">Payments</h2>
         <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancel' : 'New Payment'}
+          {showForm ? '✕ Cancel' : '+ New Payment'}
         </button>
       </div>
 
@@ -131,7 +131,7 @@ const Payments = () => {
 
       {showForm && (
         <div className="card">
-          <h3 style={{ marginBottom: '1rem' }}>Create New Payment</h3>
+          <h3 style={{ marginBottom: '1.5rem', color: '#2d3748', fontSize: '1.5rem', fontWeight: '700' }}>✨ Create New Payment</h3>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Booking</label>
@@ -220,14 +220,14 @@ const Payments = () => {
                         style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
                         onClick={() => handleProcessPayment(payment.paymentId)}
                       >
-                        Process Payment
+                        ✓ Process Payment
                       </button>
                     )}
                     {payment.status === 'PAID' && (
-                      <span style={{ color: '#27ae60' }}>✓ Processed</span>
+                      <span style={{ color: '#48bb78', fontWeight: '600', fontSize: '0.875rem' }}>✓ Processed</span>
                     )}
                     {payment.status === 'FAILED' && (
-                      <span style={{ color: '#e74c3c' }}>✗ Failed</span>
+                      <span style={{ color: '#f56565', fontWeight: '600', fontSize: '0.875rem' }}>✗ Failed</span>
                     )}
                   </td>
                 </tr>

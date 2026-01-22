@@ -222,17 +222,13 @@ zip -r payment-service.zip .
 5. Click **"Create function"**
 6. Scroll down to **"Code source"**
 7. Upload the `room-service.zip` file
-8. In the code editor, replace the handler code with:
-   ```javascript
-   // Make sure handler is set to: index.getAllRooms
-   ```
-9. Set **Handler** to: `index.getAllRooms`
-10. Click **"Deploy"**
-11. Go to **"Configuration"** → **"Environment variables"**
-12. Add environment variable:
+8. Set **Handler** to: `index.getAllRooms`
+9. Click **"Deploy"**
+10. Go to **"Configuration"** → **"Environment variables"**
+11. Add environment variable:
     - Key: `ROOMS_TABLE_NAME`
     - Value: `hotel-rooms-dev`
-13. Click **"Save"**
+12. Click **"Save"**
 
 **3.2.2 Create getRoomById Function**
 

@@ -98,10 +98,10 @@ const Bookings = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <h2 className="page-title">Bookings</h2>
         <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancel' : 'New Booking'}
+          {showForm ? '✕ Cancel' : '+ New Booking'}
         </button>
       </div>
 
@@ -111,7 +111,7 @@ const Bookings = () => {
 
       {showForm && (
         <div className="card">
-          <h3 style={{ marginBottom: '1rem' }}>Create New Booking</h3>
+          <h3 style={{ marginBottom: '1.5rem', color: '#2d3748', fontSize: '1.5rem', fontWeight: '700' }}>✨ Create New Booking</h3>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Room</label>

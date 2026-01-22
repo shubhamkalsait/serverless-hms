@@ -96,14 +96,14 @@ const Rooms = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <h2 className="page-title">Rooms</h2>
-        <div>
-          <button className="btn btn-primary" onClick={handleCheckAvailability} style={{ marginRight: '0.5rem' }}>
-            Check Availability
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button className="btn btn-primary" onClick={handleCheckAvailability}>
+            🔍 Check Availability
           </button>
           <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
-            {showForm ? 'Cancel' : 'Add Room'}
+            {showForm ? '✕ Cancel' : '+ Add Room'}
           </button>
         </div>
       </div>
@@ -114,7 +114,7 @@ const Rooms = () => {
 
       {showForm && (
         <div className="card">
-          <h3 style={{ marginBottom: '1rem' }}>Add New Room</h3>
+          <h3 style={{ marginBottom: '1.5rem', color: '#2d3748', fontSize: '1.5rem', fontWeight: '700' }}>✨ Add New Room</h3>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Room Number</label>
@@ -182,18 +182,32 @@ const Rooms = () => {
         <div className="grid">
           {rooms.map(room => (
             <div key={room.roomId} className="card-item">
-              <h3 style={{ marginBottom: '0.5rem', color: '#2c3e50' }}>
-                Room {room.roomNumber}
-              </h3>
-              <p style={{ marginBottom: '0.5rem', color: '#7f8c8d' }}>
-                <strong>Type:</strong> {room.type}
-              </p>
-              <p style={{ marginBottom: '0.5rem', color: '#7f8c8d' }}>
-                <strong>Price:</strong> ${room.price}/night
-              </p>
-              <span className={`status-badge status-${room.status}`}>
-                {room.status}
-              </span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <h3 style={{ margin: 0, color: '#2d3748', fontSize: '1.125rem', fontWeight: '700' }}>
+                  🏨 Room {room.roomNumber}
+                </h3>
+                <span className={`status-badge status-${room.status}`}>
+                  {room.status}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <div>
+                  <p style={{ margin: 0, color: '#718096', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.125rem' }}>
+                    Type
+                  </p>
+                  <p style={{ margin: 0, color: '#2d3748', fontSize: '0.875rem', fontWeight: '600', textTransform: 'capitalize' }}>
+                    {room.type}
+                  </p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ margin: 0, color: '#718096', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.125rem' }}>
+                    Price
+                  </p>
+                  <p style={{ margin: 0, color: '#ff6b35', fontSize: '1.125rem', fontWeight: '700' }}>
+                    ${parseFloat(room.price).toFixed(2)}
+                  </p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
