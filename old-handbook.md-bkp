@@ -1,0 +1,297 @@
+
+
+# Advancing Hotel Management System to Production-Grade Serverless
+
+
+This guide assumes:
+
+* booking-service, payment-service, room-service already work
+* APIs exist and return correct data
+* Frontend is running from S3
+* You own a domain name
+
+---
+
+## TARGET: What “Advanced Serverless” Means for *Your* App
+
+After these steps, your app will have:
+
+* Custom domain (no `execute-api`)
+* HTTPS everywhere
+* Proper API separation per service
+* Environment isolation (dev / prod)
+* Secure CORS (no `*`)
+* CloudFront in front of frontend
+* Clean public URLs suitable for real users
+
+---
+
+## STEP 1 — Define Your Final Domain Structure (CRITICAL)
+
+Use **subdomains**, not paths.
+
+### Recommended Structure
+
+| Component           | Domain                       |
+| ------------------- | ---------------------------- |
+| Frontend            | `dev.oncdecb24erp.shop`         |
+| Room Service API    | `api-room.oncdecb24erp.shop`    |
+| Booking Service API | `api-booking.oncdecb24erp.shop` |
+| Payment Service API | `api-payment.oncdecb24erp.shop` |
+
+This matches your **three independent microservices** exactly .
+
+---
+
+## STEP 2 — Move DNS to Route 53 (If Not Done)
+
+1. Go to **Route 53 → Hosted Zones**
+2. Create hosted zone:
+
+   ```
+   oncdecb24erp.shop
+   ```
+3. Copy **NS records**
+4. Update nameservers at your domain registrar
+
+This step is mandatory for SSL + CloudFront.
+
+---
+
+## STEP 3 — Create ONE SSL Certificate (Correct Way)
+
+### Service: AWS Certificate Manager (ACM)
+
+⚠️ **Important rule**
+
+* Must be created in **us-east-1** (CloudFront requirement)
+
+### Domains to include:
+
+```
+dev.oncdecb24erp.shop
+api-room.oncdecb24erp.shop
+api-booking.oncdecb24erp.shop
+api-payment.oncdecb24erp.shop
+```
+
+* Validation: **DNS**
+* Let ACM auto-create Route 53 records
+* Wait until status = **Issued**
+
+---
+
+## STEP 4 — Put CloudFront in Front of Frontend (Upgrade S3)
+
+Your README currently exposes S3 publicly. This is **not advanced**.
+
+### What to Change
+
+1. Create **CloudFront distribution**
+2. Origin → your S3 frontend bucket
+3. Enable:
+
+   * HTTPS redirect
+   * Origin Access Control (OAC)
+4. Attach ACM certificate
+5. Alternate domain:
+
+   ```
+   dev.oncdecb24erp.shop
+   ```
+
+### Route 53
+
+Create **A (Alias)** record:
+
+```
+dev.oncdecb24erp.shop → CloudFront
+```
+
+### Result
+
+Frontend now runs at:
+
+```
+https://dev.oncdecb24erp.shop
+```
+
+---
+
+## STEP 5 — Add Custom Domains to EACH API Gateway
+
+You already have:
+
+* room-service-api
+* booking-service-api
+* payment-service-api 
+
+Now we upgrade them.
+
+---
+
+### 5.1 Room Service API
+
+1. API Gateway → Custom domain names
+2. Create:
+
+   ```
+   api-room.oncdecb24erp.shop
+   ```
+3. Endpoint type: **Regional**
+4. Attach ACM certificate
+5. API mapping:
+
+   * `/` → room-service-api (default stage)
+
+### Route 53
+
+```
+api-room.oncdecb24erp.shop → API Gateway (alias)
+```
+
+---
+
+### 5.2 Booking Service API
+
+Repeat:
+
+```
+api-booking.oncdecb24erp.shop
+```
+
+Map to:
+
+* booking-service-api
+
+---
+
+### 5.3 Payment Service API
+
+Repeat:
+
+```
+api-payment.oncdecb24erp.shop
+```
+
+Map to:
+
+* payment-service-api
+
+---
+
+## STEP 6 — Lock Down CORS (ADVANCED SECURITY STEP)
+
+Your README uses `*` for CORS. That is **beginner-level only**.
+
+### Update CORS for EACH API:
+
+Allowed origin:
+
+```
+https://dev.oncdecb24erp.shop
+```
+
+Allowed methods:
+
+```
+GET, POST, PUT, DELETE, OPTIONS
+```
+
+❌ Do NOT use `*` anymore.
+
+---
+
+## STEP 7 — Update Frontend Environment Configuration
+
+Replace this (from README):
+
+```env
+REACT_APP_ROOM_SERVICE_URL=https://xxxx.execute-api.amazonaws.com
+```
+
+With:
+
+```env
+REACT_APP_ROOM_SERVICE_URL=https://api-room.oncdecb24erp.shop
+REACT_APP_BOOKING_SERVICE_URL=https://api-booking.oncdecb24erp.shop
+REACT_APP_PAYMENT_SERVICE_URL=https://api-payment.oncdecb24erp.shop
+```
+
+Rebuild frontend and re-upload to S3.
+
+---
+
+## STEP 8 — Environment Isolation (DEV vs PROD)
+
+You already use `{env}` in table names  — good. Now finish it.
+
+### Duplicate Everything:
+
+| Component       | Dev              | Prod         |
+| --------------- | ---------------- | ------------ |
+| DynamoDB        | `*-dev`          | `*-prod`     |
+| Lambda env vars | dev              | prod         |
+| API Gateway     | dev APIs         | prod APIs    |
+| Domains         | `dev.api-room.*` | `api-room.*` |
+
+This is **real DevOps discipline**.
+
+---
+
+## STEP 9 — Observability (Must-Have for “Advanced”)
+
+### Enable:
+
+* CloudWatch logs (already there)
+* CloudWatch alarms:
+
+  * Lambda errors
+  * API 5XX errors
+
+Optional (strong):
+
+* Access logs on CloudFront
+* API Gateway access logs
+
+---
+
+## STEP 10 — Security Hardening (Final Polish)
+
+Gradually do this:
+
+* Replace `AmazonDynamoDBFullAccess` with table-specific policies
+* Remove unused Lambda permissions
+* Add throttling in API Gateway
+* Optional: AWS WAF on CloudFront
+
+---
+
+## FINAL ARCHITECTURE (What You Now Have)
+
+```
+User
+ |
+Route 53
+ |
+CloudFront → S3 (Frontend)
+ |
+api-room.oncdecb24erp.shop → API Gateway → Lambda → DynamoDB
+api-booking.oncdecb24erp.shop → API Gateway → Lambda → DynamoDB
+api-payment.oncdecb24erp.shop → API Gateway → Lambda → DynamoDB
+```
+
+This is **legitimate production-grade serverless**, not a demo.
+
+---
+
+## What This Gives You (Career Value)
+
+* Multi-service serverless system
+* Real domain + HTTPS
+* Security-conscious design
+* Environment separation
+* Resume-grade project
+* Interview-ready explanations
+
+---
