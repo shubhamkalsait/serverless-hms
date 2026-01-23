@@ -131,7 +131,7 @@ A complete backend + frontend system managing:
 
 ### Complete System Diagram
 
-![AWS Serverless Architecture](images/aws-serverless-architecture.png)
+![AWS Serverless Architecture](aws-serverless-architecture.png)
 
 **Key Components**:
 1. **Browser** (User's device)
@@ -142,27 +142,7 @@ A complete backend + frontend system managing:
 6. **Lambda** (Business logic execution)
 7. **DynamoDB** (Persistent data storage)
 8. **CloudWatch** (Logs and metrics)
-9. **X-Ray** (Distributed tracing)
 
-### Request Flow Diagram
-
-![Request Flow Diagram](images/request-flow-diagram.png)
-
-**Example: User searches for available rooms**
-
-```
-1. Browser request → https://api-room.yourdomain.com/rooms
-2. Route 53 resolves DNS → API Gateway endpoint
-3. API Gateway validates request, adds auth headers
-4. Lambda cold-start (or warm from pool)
-5. Lambda queries DynamoDB with GSI filter
-6. DynamoDB returns available rooms
-7. Lambda formats response
-8. Response travels back through API Gateway
-9. Browser receives JSON, React renders rooms
-10. X-Ray traces entire request (timing, errors)
-11. CloudWatch records metrics
-```
 
 **Timing breakdown** (production conditions):
 - DNS resolution: 10-50ms
