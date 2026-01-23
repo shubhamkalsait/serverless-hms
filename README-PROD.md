@@ -577,3 +577,14 @@ Follow the exact reverse order of creation to avoid dangling associations.
 * Document any manual steps as runbook entries for operations staff.
 
 ---
+
+
+# Decision Matrix (Be Brutally Honest)
+
+App Type | Server | Serverless
+CRUD APIs | ⚠️ OK | ✅ Ideal
+Event-driven | ❌ Poor | ✅ Perfect
+Long jobs | ✅ Good | ❌ Bad
+WebSockets | ✅ Good |	⚠️ Limited
+Heavy CPU |	✅ Good | ❌ Bad
+Stateless APIs | ⚠️ OK | ✅ Best
